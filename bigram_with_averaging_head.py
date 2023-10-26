@@ -8,7 +8,7 @@ block_size = 8 # what is the maximum context length for predictions?
 max_iters = 3000
 eval_interval = 300
 learning_rate = 1e-2
-device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
+device = 'cpu'
 print(f"Using device: {device}")
 eval_iters = 200
 # ------------
@@ -58,34 +58,60 @@ def estimate_loss():
     model.train()
     return out
 
-# super simple bigram model
-class BigramLanguageModel(nn.Module):
 
-    def __init__(self, vocab_size):
+class AveragingHead(nn.Module):
+    """ one head of naive aggregation """
+    def __init__(self):
         super().__init__()
+
+    def forward(self, x):
+        B, T, C = x.shape
+        wei = torch.tril(torch.ones(T, T))
+        wei = F.softmax(wei.masked_fill(wei==0, float('-inf')), dim=1) # T by T lower tri mat
+        agg_x = wei @ x # (T, T) @ (B, T, C) --> (B, T, C)
+        return agg_x
+
+# super simple bigram model but with a single averaging head
+class BigramLanguageModelWithAveragingHead(nn.Module):
+
+    def __init__(self, vocab_size, n_embed):
+        super().__init__()
+        
         # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
+        self.token_embedding_table = nn.Embedding(vocab_size, n_embed)
+        self.position_embedding_table = nn.Embedding(block_size, n_embed)
+        self.head = AveragingHead()
+        self.lm_head = nn.Linear(n_embed, vocab_size)
 
     def forward(self, idx, targets=None):
-
-        # idx and targets are both (B,T) tensor of integers
-        logits = self.token_embedding_table(idx) # (B,T,C)
-
+        B, T = idx.shape
+        # idx and targets are both (B, T) tensor of integers
+        tok_emb = self.token_embedding_table(idx) # (B, T, n_embed)
+        pos_emb = self.position_embedding_table(torch.arange(T)) # (T, n_embed)
+        x = tok_emb + pos_emb # (B, T, C)
+        agg_x = self.head(x) # (B, C, C)
+        logits = self.lm_head(agg_x)  # (B, T, vocab_size)
+        
         if targets is None:
             loss = None
         else:
+            # reshape logits & targets into 2D to cater for F.corss_entropy
             B, T, C = logits.shape
             logits = logits.view(B*T, C)
             targets = targets.view(B*T)
             loss = F.cross_entropy(logits, targets)
-
+        
         return logits, loss
-
-    def generate(self, idx, max_new_tokens):
-        # idx is (B, T) array of indices in the current context
+    
+    def generate(self, idx, max_new_tokens): # idx is (B, T) array of indices in the current context
+        
+        # generate max_new_tokens tokens iteratively by looking at only the last token each time
         for _ in range(max_new_tokens):
+            
+            # crop idx to the last block_size tokens
+            idx_cropped = idx[:, -block_size:]
             # get the predictions
-            logits, loss = self(idx)
+            logits, loss = self(idx_cropped)
             # focus only on the last time step
             logits = logits[:, -1, :] # becomes (B, C)
             # apply softmax to get probabilities
@@ -96,7 +122,7 @@ class BigramLanguageModel(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
         return idx
 
-model = BigramLanguageModel(vocab_size)
+model = BigramLanguageModelWithAveragingHead(vocab_size, n_embed=32)
 m = model.to(device)
 
 # create a PyTorch optimizer
