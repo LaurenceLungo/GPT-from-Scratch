@@ -1,6 +1,6 @@
 # GPT-from-Scratch
 
-An step-by-step derivation and implementation of the GPT architecture from scratch, following the original papers on GPT and the transformer model. This is mostly a personal exercise to deepen my understanding on self-attention, transformer, causal languaging modelling and unsupervised pretraining, but can also serve as a guide for anyone interested to derive the GPT architecture from first principle.
+A step-by-step derivation and implementation of the GPT architecture from scratch, following the original papers on GPT and the transformer model. This is mostly a personal exercise to deepen my understanding on self-attention, transformer, causal languaging modelling and unsupervised pretraining, but can also serve as a guide for anyone interested to derive the GPT architecture from first principle.
 
 ## Technologies Used
 
