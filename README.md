@@ -9,7 +9,7 @@ A step-by-step derivation and implementation of the GPT architecture from scratc
 
 ## Usage
 
-The complete derivation walkthrough is at the Jupyter notebook `derive-gpt-from-scratch.ipynb`.
+The complete derivation walkthrough is on the Jupyter notebook `derive-gpt-from-scratch.ipynb`.
 
 ## Acknowledgments
 
