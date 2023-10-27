@@ -2,7 +2,7 @@
 ![multi-head attention](reading_medusa.jpg)
 *Multi-head attention (created with DALL.E 3*)
 
-A step-by-step derivation and implementation of the GPT architecture from scratch, following the original paper on GPT: [Improving Language Understanding by Generative Pre-Training (Radford et al. 2018)](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) and the transformer model: [Attention is All You Need (Vaswani et al. 2017)](https://arxiv.org/abs/1706.03762). This is mostly a personal exercise to deepen my understanding on self-attention, transformer, causal languaging modelling and unsupervised pretraining, but can also serve as a guide for anyone interested to derive the GPT architecture from first principle.
+A step-by-step derivation and implementation of the GPT architecture from scratch, following the original paper on GPT: [Improving Language Understanding by Generative Pre-Training (Radford et al. 2018)](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) and the transformer model: [Attention is All You Need (Vaswani et al. 2017)](https://arxiv.org/abs/1706.03762). This is mostly a personal exercise to deepen my understanding on multi-head self-attention, transformer, causal languaging modelling and unsupervised pretraining, but can also serve as a guide for anyone interested to derive the GPT architecture from first principle.
 
 ## Dependencies
 
