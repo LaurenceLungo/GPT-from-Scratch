@@ -12,6 +12,8 @@ A step-by-step derivation and implementation of the GPT architecture from scratc
 
 The complete derivation walkthrough is on the Jupyter notebook `derive-gpt-from-scratch.ipynb`.
 
+At the end of the walkthrough, we will get a GPT model that can write Shakespeare-style plays (or gibberish).
+
 ## Acknowledgments
 
 This project references the following resources:
